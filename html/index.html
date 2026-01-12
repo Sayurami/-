@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KEITH API</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00df9a;
+            --secondary: #7c3aed;
+            --background: #0a0a0a;
+            --surface: #1a1a1a;
+            --text: #f5f5f5;
+            --active: #00df9a;
+            --inactive: #dc2626;
+            --testing: #fbbf24;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+            min-height: 100vh;
+            font-weight: 400;
+            letter-spacing: -0.015em;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+            padding: 2rem 0;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 2px;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            background: var(--surface);
+            border-radius: 1rem;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        th {
+            background: var(--surface);
+            font-weight: 600;
+            color: var(--primary);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .endpoint-name {
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .try-btn {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: opacity 0.2s ease;
+            font-size: 0.9rem;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .try-btn:hover {
+            opacity: 0.9;
+        }
+
+        .status {
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.5rem;
+            display: inline-block;
+        }
+
+        .status.testing {
+            color: var(--testing);
+        }
+
+        .status.active {
+            color: var(--active);
+        }
+
+        .status.inactive {
+            color: var(--inactive);
+        }
+
+        .blinking-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: var(--active);
+            border-radius: 50%;
+            margin-left: 5px;
+            animation: blink 1s infinite;
+        }
+
+        .category {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .category-count {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--primary);
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>KEITH API</h1>
+            <p>Modern interface for accessing powerful API endpoints</p>
+            <p><strong>Total Endpoints: <span id="total-endpoints"></span></strong></p>
+        </header>
+
+        <main>
+            <!-- Downloaders Section -->
+            <div class="category">
+                <span>Downloaders</span>
+                <span class="category-count" id="downloaders-count"></span>
+            </div>
+            <table id="downloaders">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Feature Name</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+            <!-- AI Section -->
+            <div class="category">
+                <span>AI</span>
+                <span class="category-count" id="ai-count"></span>
+            </div>
+            <table id="ai">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Feature Name</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+            <!-- Search Section -->
+            <div class="category">
+                <span>Search</span>
+                <span class="category-count" id="search-count"></span>
+            </div>
+            <table id="search">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Feature Name</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+            <!-- Movie Section -->
+            <div class="category">
+                <span>Movie</span>
+                <span class="category-count" id="movie-count"></span>
+            </div>
+            <table id="movie">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Feature Name</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+            <!-- Tools Section -->
+            <div class="category">
+                <span>Tools</span>
+                <span class="category-count" id="tools-count"></span>
+            </div>
+            <table id="tools">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Feature Name</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+            <!-- Images Section -->
+            <div class="category">
+                <span>Images</span>
+                <span class="category-count" id="images-count"></span>
+            </div>
+            <table id="images">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Feature Name</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+            <!-- Gameballs Section -->
+            <div class="category">
+                <span>Gameballs</span>
+                <span class="category-count" id="gameballs-count"></span>
+            </div>
+            <table id="gameballs">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Feature Name</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+            <!-- Stalkers Section -->
+            <div class="category">
+                <span>Stalkers</span>
+                <span class="category-count" id="stalkers-count"></span>
+            </div>
+            <table id="stalkers">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Feature Name</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+            <!-- Fun Section -->
+            <div class="category">
+                <span>Fun</span>
+                <span class="category-count" id="fun-count"></span>
+            </div>
+            <table id="fun">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Feature Name</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </main>
+    </div>
+
+    <script>
+        const TIMEOUT_DURATION = 5000; // 5 seconds timeout
+
+        const endpoints = [
+            // Downloaders
+            { category: "downloaders", name: "YouTube MP3", url: "/download/dlmp3?url=https://youtu.be/2WmBa1CviYE?si=D0LWN3LAaE6nGFBo", description: "Download YouTube videos as MP3 files." },
+            { category: "downloaders", name: "YouTube MP4", url: "/download/dlmp4?url=https://youtu.be/2WmBa1CviYE?si=D0LWN3LAaE6nGFBo", description: "Download YouTube videos as MP4 files." },
+            { category: "downloaders", name: "xvideo Download", url: "/download/porn?url=https://www.xvideos.com/video.hppakie6a79/mia_khalifa_fucks_a_fanboy", description: "Download Xvideos  " }, 
+            { category: "downloaders", name: "Piniimg Download", url: "/download/piniimg?text=car", description: "Download images from Piniimg." },
+            { category: "downloaders", name: "Twitter Download", url: "/download/twitter?url=https://twitter.com/futurism/status/882987478541533189", description: "Download videos from Twitter." },
+            { category: "downloaders", name: "Spotify", url: "/download/spotify?q=spectre", description: "download spotify audio tracks." },
+            { category: "downloaders", name: "TikTok Download", url: "/download/tiktokdl?url=https://vt.tiktok.com/ZSje1Vkup/", description: "Download videos from TikTok." }, 
+            { category: "downloaders", name: "Instagram Download", url: "/download/instagramdl?url=https://www.instagram.com/reel/DD6q97IuzxD/?igsh=YzljYTk1ODg3Zg==", description: "Download videos from Instagram." },
+            { category: "downloaders", name: "MediaFire Download", url: "/download/mfire?url=https://www.mediafire.com/file/yce2h1da3kqzh27/WhatsApp+Installer.exe/file", description: "Download files from MediaFire." },
+            { category: "downloaders", name: "APKFab Download", url: "/download/apkfab?url=https://apkfab.com/whatsapp-messenger/com.whatsapp", description: "Download APK files from APKFab." },
+            { category: "downloaders", name: "Mod WhatsApp Download", url: "/download/modwhatsappdl?url=https://apkdon.net/fouad-whatsapp/", description: "Download modified WhatsApp APK." },
+            { category: "downloaders", name: "Mod WA Download", url: "/download/modwadl?url=https://apkdon.net/fouad-whatsapp-download-latest-version/", description: "Download modified WhatsApp APK." },
+            { category: "downloaders", name: "Facebook Download", url: "/download/fbdown?url=https://www.facebook.com/share/r/19zyz6X8KJ/", description: "Download videos from Facebook." },
+            { category: "downloaders", name: "SoundCloud Download", url: "/download/soundcloud?url=https://m.soundcloud.com/nilanhettiarachchi/lelena", description: "Download audio from SoundCloud." },
+            { category: "downloaders", name: "Appletone Download", url: "/download/appletone?text=2024", description: "Download ringtones from Appletone." },
+            { category: "downloaders", name: "Appletone DL", url: "/download/appletonedl?url=https://www.prokerala.com/downloads/ringtones/download.php?id=62159", description: "Download ringtones from Appletone." },
+            { category: "downloaders", name: "Hentai video", url: "/dl/hentaivid", description: "Get a random hentaivideo." },
+
+            // Images
+            { category: "images", name: "Logo", url: "/logo", description: "Generate logos." },
+            { category: "images", name: "Wallpaper Download", url: "/download/wallpaper?text=car&page=1", description: "Download wallpapers." },
+            { category: "images", name: "bing", url: "/ai/bing?q=dog", description: "download ai image." },
+            { category: "images", name: "anime imagine", url: "/ai/animaginexl?q=dog", description: "download ai image." },
+            { category: "images", name: "anime mix", url: "/ai/animemix?q=dog", description: "download ai image." },
+            { category: "images", name: "blazing drive", url: "/ai/blazingdrive?q=dog", description: "download ai image." },
+            { category: "images", name: "braindance", url: "/ai/braindance?q=dog", description: "download ai image." },
+            { category: "images", name: "cogview", url: "/ai/cogview?q=dog", description: "download ai image." },
+            { category: "images", name: "cyberxl", url: "/ai/cyberxl?q=dog", description: "download ai image." },
+            { category: "images", name: "dalle", url: "/ai/dalle?q=dog", description: "download ai image." },
+            { category: "images", name: "dalle2", url: "/ai/dalle2?q=dog", description: "download ai image." },
+            { category: "images", name: "dreamshaper", url: "/ai/dreamshaper?q=dog", description: "download ai image." },
+            { category: "images", name: "flux", url: "/ai/flux?q=dog", description: "download ai image." },
+            { category: "images", name: "flux pro ultra", url: "/ai/fluxproultra?q=dog", description: "download ai image." },
+            { category: "images", name: "WallpapersCraft Search", url: "/search/wallpaperscraft?q=car", description: "Search for wallpapers on WallpapersCraft." },
+
+            // AI
+            { category: "ai", name: "GPT", url: "/ai/gpt?q=hello", description: "Access the GPT AI model." },
+            { category: "ai", name: "Gemini-1.5-Flash vision", url: "/ai/gemini-vision2?image=https://files.catbox.moe/ev83k8.jpg&q=What's%20in%20this%20image", description: "Access the Gemini AI vision model." },
+            { category: "ai", name: "Gemini-vision", url: "/ai/gemini-vision?image=https://files.catbox.moe/ev83k8.jpg&q=What's%20in%20this%20image", description: "Access the Gemini AI vision model." },
+            { category: "ai", name: "Meta AI", url: "/ai/metai?q=hello", description: "Access the Meta AI model." },
+            { category: "ai", name: "Deeepseek AI", url: "/ai/deepseek?q=hello", description: "Access the Deepseek AI model." },
+            { category: "ai", name: "Blackbox", url: "/ai/blackbox?q=Hello", description: "Access the Blackbox AI model." },
+            { category: "ai", name: "Ilama", url: "/ai/ilama?q=Hello", description: "Access the Ilama AI model." },
+            { category: "ai", name: "gemini", url: "/ai/gemini?q=Hello", description: "Access the Gemini AI model." }, 
+            { category: "ai", name: "Bard AI", url: "/ai/bard?q=Hello", description: "Access the Bard AI model." },
+
+            // Search
+            { category: "search", name: "YouTube Search", url: "/search/yts?query=spectre", description: "Search for videos on YouTube." },
+            { category: "search", name: "Bing Search", url: "/search/bing?query=Cat", description: "Search for bing ." },
+            { category: "search", name: "TikTok Trend search", url: "/download/tiktoktrend?region=KE", description: "Search trending tiktoks in your region." },
+            { category: "search", name: "Lyrics Search", url: "/search/lyrics?query=spectre", description: "Search for song lyrics." },
+           
+            { category: "search", name: "TikTok Search", url: "/search/tiktoksearch?query=keizzah4189", description: "provide a username to search in TikTok ." },
+            { category: "search", name: "Search Instagram user", url: "/search/instauser?user=keith_keizzah", description: "provide an Instagram username." },
+            { category: "search", name: "SoundCloud Search", url: "/search/soundcloud?q=lelena", description: "Search for audio on SoundCloud." },
+            { category: "search", name: "Tweets Search", url: "/search/searchtweets?q=Elon Musk", description: "Search for x tweets." },
+            { category: "search", name: "xvideo Search", url: "/search/searchxvideos?q=dick", description: "Search for Xvideos." },
+            { category: "search", name: "TikTok user posts Search", url: "/search/tiktokuserposts?user=keizzah4189", description: "Search for users posts in tiktok." },
+            { category: "search", name: "Spotify Search", url: "/search/spotify?q=lelena", description: "Search for music on Spotify." },
+            
+            { category: "search", name: "APKFab Search", url: "/search/apkfab?q=whatsapp", description: "Search for APKs on APKFab." },
+            { category: "search", name: "Sticker Search", url: "/search/sticker?q=cat", description: "Search for stickers." },
+            { category: "search", name: "Mod WhatsApp Search", url: "/search/modwhatsapp?q=gbwhatsapp", description: "Search for modified WhatsApp APKs." },
+            { category: "search", name: "HappyMod Search", url: "/search/happymodSearch?q=car", description: "Search for apps on HappyMod." },
+
+            // Movie
+            { category: "movie", name: "Sinhalasub Search", url: "/movie/sinhalasub/search?text=Vikings", description: "Search for movies on Sinhalasub." },
+            { category: "movie", name: "Sinhalasub Movie", url: "/movie/sinhalasub/movie?url=https://sinhalasub.lk/movies/outbreak-2024-sinhala-subtitles/", description: "Get movie details from Sinhalasub." },
+            { category: "movie", name: "Sinhalasub TV Show", url: "/movie/sinhalasub/tvshow?url=https://sinhalasub.lk/tvshows/game-of-thrones-2011-sinhala-subtitles/", description: "Get TV show details from Sinhalasub." },
+            { category: "movie", name: "Sinhalasub Episode", url: "/movie/sinhalasub/episode?url=https://sinhalasub.lk/episodes/game-of-thrones-1x1/", description: "Get episode details from Sinhalasub." },
+            { category: "movie", name: "Pirate Search", url: "/movie/pirate/search?text=2024", description: "Search for movies on Pirate." },
+            { category: "movie", name: "Pirate Movie", url: "/movie/pirate/movie?url=https://pirate.lk/movies/sector-36-2024-sinhala-sub/", description: "Get movie details from Pirate." },
+            { category: "movie", name: "Zoom Search", url: "/movie/zoom/search?text=2024", description: "Search for movies on Zoom." },
+            { category: "movie", name: "Zoom Movie", url: "/movie/zoom/movie?url=https://zoom.lk/red-one-2024-sinhala-subtitle-%e0%b7%83%e0%b7%92%e0%b6%82%e0%b7%84%e0%b6%bd-%e0%b6%8b%e0%b6%b4%e0%b7%83%e0%b7%92%e0%b6%bb%e0%b7%90%e0%b7%83%e0%b7%92/", description: "Get movie details from Zoom." },
+            { category: "movie", name: "FireMovie Search", url: "/movie/firemovie?text=2024", description: "Search for movies on FireMovie." },
+
+            // Tools
+            { category: "tools", name: "Translate", url: "/translate?text=hello&lang=fr", description: "Translate text into different languages." },
+            { category: "tools", name: "Temp Mail", url: "/tempmail", description: "Generate temporary email addresses." },
+           
+            { category: "tools", name: "scrap website", url: "/webscrap?url=https://keithmd-l4qc.onrender.com", description: "breakdown all website languages" }, 
+            { category: "tools", name: "Get Inbox Temp Mail", url: "/get_inbox_tempmail?q=", description: "Fetch inbox for temporary email." },
+            { category: "tools", name: "Temp Number", url: "/tempnumber", description: "Generate temporary phone numbers." },
+
+            // Gameballs
+            { category: "gameballs", name: "EPL Upcoming Matches", url: "/epl/upcomingmatches", description: "Get upcoming EPL matches." },
+            { category: "gameballs", name: "EPL Matches", url: "/epl/matches", description: "Get EPL match details." },
+            { category: "gameballs", name: "EPL Standings", url: "/epl/standings", description: "Get EPL standings." },
+            { category: "gameballs", name: "EPL Top scorers", url: "/epl/scorers", description: "Get EPL top scorers." },            
+            { category: "gameballs", name: "Bundesliga Upcoming Matches", url: "/bundesliga/upcomingmatches", description: "Get upcoming Bundesliga matches." },
+            { category: "gameballs", name: "Bundesliga Matches", url: "/bundesliga/matches", description: "Get Bundesliga match details." },
+            { category: "gameballs", name: "Bundesliga Standings", url: "/bundesliga/standings", description: "Get Bundesliga standings." },
+            { category: "gameballs", name: "Bundesliga Top Scorers", url: "/bundesliga/scorers", description: "Get Bundesliga top scorers." },
+            { category: "gameballs", name: "Euros Upcoming Matches", url: "/euros/upcomingmatches", description: "Get upcoming Euros matches." },
+            { category: "gameballs", name: "Euros Matches", url: "/euros/matches", description: "Get Euros match details." },
+            { category: "gameballs", name: "Euros Standings", url: "/euros/standings", description: "Get Euros standings." },
+            { category: "gameballs", name: "Euros Top Scorers", url: "/euros/scorers", description: "Get Euros top scorers." },
+            { category: "gameballs", name: "FIFA Upcoming Matches", url: "/fifa/upcomingmatches", description: "Get upcoming FIFA matches." },
+            { category: "gameballs", name: "FIFA Matches", url: "/fifa/matches", description: "Get FIFA match details." },
+            { category: "gameballs", name: "FIFA Standings", url: "/fifa/standings", description: "Get FIFA standings." },
+            { category: "gameballs", name: "FIFA Top Scorers", url: "/fifa/scorers", description: "Get FIFA top scorers." },
+            { category: "gameballs", name: "La Liga Upcoming Matches", url: "/laliga/upcomingmatches", description: "Get upcoming La Liga matches." },
+            { category: "gameballs", name: "La Liga Matches", url: "/laliga/matches", description: "Get La Liga match details." },
+            { category: "gameballs", name: "La Liga Standings", url: "/laliga/standings", description: "Get La Liga standings." },
+            { category: "gameballs", name: "La Liga Top Scorers", url: "/laliga/scorers", description: "Get La Liga top scorers." },
+            { category: "gameballs", name: "Ligue 1 Upcoming Matches", url: "/ligue1/upcomingmatches", description: "Get upcoming Ligue 1 matches." },
+            { category: "gameballs", name: "Ligue 1 Matches", url: "/ligue1/matches", description: "Get Ligue 1 match details." },
+            { category: "gameballs", name: "Ligue 1 Standings", url: "/ligue1/standings", description: "Get Ligue 1 standings." },
+            { category: "gameballs", name: "Ligue 1 Top Scorers", url: "/ligue1/scorers", description: "Get Ligue 1 top scorers." },
+            { category: "gameballs", name: "Serie A Upcoming Matches", url: "/seriea/upcomingmatches", description: "Get upcoming Serie A matches." },
+            { category: "gameballs", name: "Serie A Matches", url: "/seriea/matches", description: "Get Serie A match details." },
+            { category: "gameballs", name: "Serie A Standings", url: "/seriea/standings", description: "Get Serie A standings." },
+            { category: "gameballs", name: "Serie A Top Scorers", url: "/seriea/scorers", description: "Get Serie A top scorers." },
+            { category: "gameballs", name: "UCL Upcoming Matches", url: "/ucl/upcomingmatches", description: "Get upcoming UCL matches." },
+            { category: "gameballs", name: "UCL Matches", url: "/ucl/matches", description: "Get UCL match details." },
+            { category: "gameballs", name: "UCL Standings", url: "/ucl/standings", description: "Get UCL standings." },
+            { category: "gameballs", name: "UCL Top Scorers", url: "/ucl/scorers", description: "Get UCL top scorers." },
+
+
+            // Stalkers
+            { category: "stalkers", name: "TikTok Stalk", url: "/stalker/tiktok?user=keizzah4189", description: "Stalk TikTok profiles." },
+            { category: "stalkers", name: "Instagram Stalk", url: "/stalker/ig?user=keithkeizzah ", description: "Stalk Instagram profile" },
+            { category: "stalkers", name: "GitHub Repo Stalk", url: "/stalker/repostalk?url=https://github.com/Keithkeizzah/KEITH-MD", description: "Stalk GitHub repository." },  
+            { category: "stalkers", name: "Twitter Stalk", url: "/stalker/twitter?user=keithkeizzah", description: "Stalk Twitter profile." },  
+            { category: "stalkers", name: "Youtube channel Stalk", url: "/stalker/ytchannel?user=keithkeizzah", description: "Stalk user YouTube channel." },
+            { category: "stalkers", name: "wachannel Stalk", url: "/stalker/wachannel?url=https://whatsapp.com/channel/0029Vaan9TF9Bb62l8wpoD47", description: "Stalk Whatsapp channel." },   
+            { category: "stalkers", name: "Country info Stalk", url: "/stalker/country?region=Kenya", description: "Stalk Country Info." },  
+            { category: "stalkers", name: "NPM Stalk", url: "/stalker/npm?q=baileys", description: "Stalk NPM package." },
+            { category: "stalkers", name: "IP Stalk", url: "/stalker/ip?q=41.90.216.105", description: "Stalk IP address." },
+
+            // Fun
+            { category: "fun", name: "Truth", url: "/truth", description: "Get a random truth question." },
+            { category: "fun", name: "Dare", url: "/dare", description: "Get a random dare." }
+        ];
+
+        const categories = {
+            downloaders: document.querySelector("#downloaders tbody"),
+            ai: document.querySelector("#ai tbody"),
+            movie: document.querySelector("#movie tbody"),
+            search: document.querySelector("#search tbody"),
+            tools: document.querySelector("#tools tbody"),
+            images: document.querySelector("#images tbody"),
+            gameballs: document.querySelector("#gameballs tbody"),
+            stalkers: document.querySelector("#stalkers tbody"),
+            fun: document.querySelector("#fun tbody")
+        };
+
+        const categoryCounts = {
+            downloaders: 0,
+            ai: 0,
+            movie: 0,
+            search: 0,
+            tools: 0,
+            images: 0,
+            gameballs: 0,
+            stalkers: 0,
+            fun: 0
+        };
+
+        // Count endpoints in each category
+        endpoints.forEach(endpoint => {
+            categoryCounts[endpoint.category]++;
+        });
+
+        // Update total endpoints
+        const totalEndpoints = endpoints.length;
+        document.getElementById("total-endpoints").textContent = totalEndpoints;
+
+        // Update category counts in the UI
+        document.getElementById("downloaders-count").textContent = `${categoryCounts.downloaders} endpoints`;
+        document.getElementById("ai-count").textContent = `${categoryCounts.ai} endpoints`;
+        document.getElementById("movie-count").textContent = `${categoryCounts.movie} endpoints`;
+        document.getElementById("search-count").textContent = `${categoryCounts.search} endpoints`;
+        document.getElementById("tools-count").textContent = `${categoryCounts.tools} endpoints`;
+        document.getElementById("images-count").textContent = `${categoryCounts.images} endpoints`;
+        document.getElementById("gameballs-count").textContent = `${categoryCounts.gameballs} endpoints`;
+        document.getElementById("stalkers-count").textContent = `${categoryCounts.stalkers} endpoints`;
+        document.getElementById("fun-count").textContent = `${categoryCounts.fun} endpoints`;
+
+        // Render endpoints
+        endpoints.forEach((endpoint, index) => {
+            const row = document.createElement("tr");
+
+            const numberCell = document.createElement("td");
+            numberCell.textContent = index + 1;
+
+            const nameCell = document.createElement("td");
+            nameCell.className = "endpoint-name";
+            nameCell.textContent = endpoint.name;
+
+            const descriptionCell = document.createElement("td");
+            descriptionCell.textContent = endpoint.description;
+
+            const statusCell = document.createElement("td");
+            const statusText = document.createElement("span");
+            statusText.className = "status testing";
+            statusText.textContent = "testing...";
+            statusCell.appendChild(statusText);
+
+            const actionsCell = document.createElement("td");
+            const tryBtn = document.createElement("a");
+            tryBtn.className = "try-btn";
+            tryBtn.textContent = "Try";
+            tryBtn.href = endpoint.url;
+            tryBtn.target = "_blank";
+            actionsCell.appendChild(tryBtn);
+
+            row.appendChild(numberCell);
+            row.appendChild(nameCell);
+            row.appendChild(descriptionCell);
+            row.appendChild(statusCell);
+            row.appendChild(actionsCell);
+
+            categories[endpoint.category].appendChild(row);
+
+            const timeoutId = setTimeout(() => {
+                statusText.textContent = "inactive";
+                statusText.className = "status inactive";
+            }, TIMEOUT_DURATION);
+
+            fetch(endpoint.url)
+                .then(response => {
+                    if (!response.ok) throw new Error("API error");
+                    return response.json();
+                })
+                .then(data => {
+                    clearTimeout(timeoutId);
+                    if (data.success === true || data.status === true) {
+                        statusText.innerHTML = `active <span class="blinking-dot"></span>`;
+                        statusText.className = "status active";
+                    } else {
+                        statusText.textContent = "inactive";
+                        statusText.className = "status inactive";
+                    }
+                })
+                .catch(() => {
+                    clearTimeout(timeoutId);
+                    statusText.textContent = "inactive";
+                    statusText.className = "status inactive";
+                });
+        });
+    </script>
+</body>
+</html><!--  -->
